@@ -1,10 +1,27 @@
 import { Avatar } from './Avatar';
 import { Comment } from './Comment';
 import { format, formatDistanceToNow } from 'date-fns';
-import { useState } from 'react';
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 import styles from '../styles/Post.module.css'
 
-export function Post({author, publishedAt, content}){
+interface Author{
+    name: string;
+    role: string;
+    avatarUrl: string;
+}
+
+interface Content{
+    type: 'paragraph' | 'link';
+    content: string;
+}
+
+interface PostProps{
+    author: Author;
+    publishedAt: Date;
+    content: Content[];
+}
+
+export function Post({author, publishedAt, content}:PostProps){
 
     const [comments, setComments] = useState ([
         'Very cool post, huh!?'
@@ -23,22 +40,22 @@ export function Post({author, publishedAt, content}){
         }
     )
 
-    function handleCreateNewComment(){
+    function handleCreateNewComment(event: FormEvent){
         event.preventDefault()
         setComments([...comments, newCommentText]);
         setNewCommentText('')
     }
 
-    function handleNewCommentChange(){
+    function handleNewCommentChange(event: ChangeEvent<HTMLTextAreaElement>){
         event.target.setCustomValidity('');
         setNewCommentText(event.target.value);
     }
 
-    function handleNewCommentInvalid(){
-        event.target.setCustonValidty('Required field!')
+    function handleNewCommentInvalid(event: InvalidEvent<HTMLTextAreaElement>){
+        event.target.setCustomValidity('Required field!')
     }
 
-    function deleteComment(commentToDelete){
+    function deleteComment(commentToDelete:string){
         const commentsWithoutDeletedOne = comments.filter(comment => {
             return comment !== commentToDelete;
         })
@@ -52,7 +69,7 @@ export function Post({author, publishedAt, content}){
             <header>
                 <div className={styles.author}>
 
-                    <Avatar src={author.avatarUrl} alt="User picture" />
+                    <Avatar src={author.avatarUrl} alt="" />
 
                     <div className={styles.authorInfo}>
                         <strong>{author.name}</strong>
